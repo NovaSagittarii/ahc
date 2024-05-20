@@ -1,5 +1,5 @@
 import random
-from main import solve
+from main import solve_multi
 
 n = 5
 random.seed(0)
@@ -14,11 +14,11 @@ def gen_input(n: int):
     
     return a
 
-T = 10
+T = 100
 penalty = 0
 for _ in range(T):
     a = gen_input(n)
-    s, y = solve(n, a)
+    s, y = solve_multi(n, a)
     penalty += s
 
 print(penalty / T)

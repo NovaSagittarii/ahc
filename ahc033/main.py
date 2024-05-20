@@ -1,3 +1,6 @@
+import random
+
+
 def count_inversions(a: "list[int]"):
     inversions = 0
     for i in range(len(a)):
@@ -7,7 +10,7 @@ def count_inversions(a: "list[int]"):
     return inversions
 
 
-def solve(n: int, a: "list[list[int]]"):
+def solve(n: int, a: "list[list[int]]", strategy: int = 0):
     # b = [[x // n for x in row] for row in a]
     curr = [0 for i in range(n)]
     grid = [[-1 for _ in range(n)] for _ in range(n)]
@@ -113,6 +116,9 @@ def solve(n: int, a: "list[list[int]]"):
                 return False
 
         def struggle(self):
+            dx, dy = ((1, 0), (0, 1), (-1, 0), (0, -1))[random.randint(0, 3)]
+            self.goto(self.x + dx, self.y + dy, False)
+            return
             dx, dy = ((1, 0), (0, 1), (-1, 0), (0, -1))[self.cycle]
             if not self.goto(self.x + dx, self.y + dy, False):
                 self.cycle += 1
@@ -156,7 +162,7 @@ def solve(n: int, a: "list[list[int]]"):
                     self.bomb()
                 # elif self.
             else:  # move it over
-                if self.goto(n - 1, self.hold // n):
+                if self.goto(n - 1, [self.y, self.hold // n][strategy]):
                     self.drop()
                 else:
                     self.goto(self.x + 1, self.y)
@@ -179,13 +185,36 @@ def solve(n: int, a: "list[list[int]]"):
         pad()
         clear_residue()
 
-    score = len(cranes[0].seq) + 100 * sum(count_inversions(x) for x in output)
+    M0 = len(cranes[0].seq)
+    M1 = sum(
+        count_inversions([x for x in row if i == x // n])
+        for i, row in enumerate(output)
+    )
+    M2 = sum(sum(i != x // n for x in row) for i, row in enumerate(output))
+    M3 = sum(n - x for x in curr)
+    score = M0 + 100 * M1 + 10000 * M2 + 1000000 * M3
     return (score, "\n".join(crane.seq for crane in cranes))
+
+
+def rep(x: int, n: int):
+    return [x for i in range(n)]
+
+
+def solve_multi(n: int, a: "list[list[int]]"):
+    strategies = [0, *rep(1, 10)]
+    best = 1e9
+    ans = ""
+    for strategy in strategies:
+        score, res = solve(n, a, strategy)
+        if score < best:
+            best = score
+            ans = res
+    return (best, ans)
 
 
 if __name__ == "__main__":
     n = int(input())
     a = [[int(x) for x in input().strip().split()] for _ in range(n)]
-    score, ans = solve(n, a)
+    score, ans = solve_multi(n, a)
     print(score)
     print(ans)
