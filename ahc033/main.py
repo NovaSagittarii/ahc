@@ -1,8 +1,18 @@
-def solve(n, a):
-    b = [[x // n for x in row] for row in a]
+def count_inversions(a: "list[int]"):
+    inversions = 0
+    for i in range(len(a)):
+        for j in range(i + 1, len(a)):
+            if a[i] > a[j]:
+                inversions += 1
+    return inversions
+
+
+def solve(n: int, a: "list[list[int]]"):
+    # b = [[x // n for x in row] for row in a]
     curr = [0 for i in range(n)]
     grid = [[-1 for _ in range(n)] for _ in range(n)]
     cgrid = [[0 for _ in range(n)] for _ in range(n)]
+    output = [[] for _ in range(n)]
     cranes = []
 
     def process_insert():
@@ -66,6 +76,7 @@ def solve(n, a):
         def drop(self):
             if self.hold == -1:
                 return self.nop()
+            output[self.y].append(self.hold)
             self.seq += "Q"
             self.hold = -1
 
@@ -168,7 +179,7 @@ def solve(n, a):
         pad()
         clear_residue()
 
-    score = len(cranes[0].seq)
+    score = len(cranes[0].seq) + 100 * sum(count_inversions(x) for x in output)
     return (score, "\n".join(crane.seq for crane in cranes))
 
 
@@ -176,4 +187,5 @@ if __name__ == "__main__":
     n = int(input())
     a = [[int(x) for x in input().strip().split()] for _ in range(n)]
     score, ans = solve(n, a)
+    print(score)
     print(ans)
