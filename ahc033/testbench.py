@@ -14,11 +14,12 @@ def gen_input(n: int):
     
     return a
 
-T = 100
+T = 50
 penalty = 0
 for _ in range(T):
     a = gen_input(n)
     s, y = solve_multi(n, a)
     penalty += s
 
-print(penalty / T)
+print("prev", 110747)
+print("curr", penalty)

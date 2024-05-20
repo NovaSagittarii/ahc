@@ -162,7 +162,7 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
                     self.bomb()
                 # elif self.
             else:  # move it over
-                if self.goto(n - 1, [self.y, self.hold // n][strategy]):
+                if self.goto(n - 1, self.hold // n):
                     self.drop()
                 else:
                     self.goto(self.x + 1, self.y)
@@ -201,7 +201,7 @@ def rep(x: int, n: int):
 
 
 def solve_multi(n: int, a: "list[list[int]]"):
-    strategies = [0, *rep(1, 10)]
+    strategies = [*rep(1, 60)]
     best = 1e9
     ans = ""
     for strategy in strategies:
