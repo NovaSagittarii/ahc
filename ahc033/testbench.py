@@ -21,5 +21,5 @@ for _ in range(T):
     s, y = solve_multi(n, a)
     penalty += s
 
-print("prev", 110747)
+print("prev", 102750)
 print("curr", penalty)

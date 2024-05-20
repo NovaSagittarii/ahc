@@ -40,13 +40,13 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
 
     class Crane:
         def __init__(self, x: int, y: int):
+            self.big: bool = y == 0
             self.x = x
             self.y = y
             self.id = y
             self.hold: int = -1
             self.seq: str = ""
             cgrid[y][x] = 1
-            self.cycle = self.id % 4
             self.dead = False
 
         def dx(self, n: int):
@@ -118,11 +118,6 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
         def struggle(self):
             dx, dy = ((1, 0), (0, 1), (-1, 0), (0, -1))[random.randint(0, 3)]
             self.goto(self.x + dx, self.y + dy, False)
-            return
-            dx, dy = ((1, 0), (0, 1), (-1, 0), (0, -1))[self.cycle]
-            if not self.goto(self.x + dx, self.y + dy, False):
-                self.cycle += 1
-                self.cycle %= 4
 
         def goto(self, x: int, y: int, can_struggle: bool = True):
             dx = x - self.x
