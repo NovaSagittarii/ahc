@@ -18,6 +18,7 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
     grid = [[-1 for _ in range(n)] for _ in range(n)]
     cgrid = [[0 for _ in range(n)] for _ in range(n)]
     output = [[] for _ in range(n)]
+    dispatch_count = [0]
     cranes = []
 
     def process_insert():
@@ -83,6 +84,7 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
                 return self.nop()
             if self.x == n - 1:
                 output[self.y].append(self.hold)
+                dispatch_count[0] += 1
             else:
                 grid[self.y][self.x] = self.hold
             self.seq += "Q"
@@ -130,6 +132,8 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
             dx = x - self.x
             dy = y - self.y
             # print(f"goto {x},{y}")
+            if not self.big:
+                can_struggle = False
             if dx or dy:  # go closer
                 if self.x < self.y - 2 + self.id:
                     if not self.step_x(dx):
@@ -158,7 +162,7 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
             if not self.big and curr[self.id] >= n - 1 and self.hold == -1:
                 self.bomb()
             if self.hold == -1:  # find *something*
-                if self.big:
+                if self.big and cranes[1].dead:
                     # find something good to take?
                     good = []
                     for x, y in coords:
@@ -178,14 +182,14 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
                         if self.goto(x, y):
                             self.take()
                         return
-                candidates = sorted(
-                    [
-                        (abs(i - self.y), 0, self.y + 0 * i)
-                        for i in range(n)
-                        if grid[i][0] != -1
-                    ]
-                )
-                # candidates = [(0, 0, self.y)]
+                # candidates = sorted(
+                #     [
+                #         (abs(i - self.y), 0, self.y + 0 * i)
+                #         for i in range(n)
+                #         if grid[i][0] != -1
+                #     ]
+                # )
+                candidates = [(0, 0, self.y)] 
                 # if grid[self.y][0] == -1: candidates = []
                 if len(candidates):
                     if self.goto(*candidates[0][1:]):
@@ -197,7 +201,7 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
                     self.bomb()
                 # elif self.
             else:  # move it over
-                if self.big:
+                if self.big and cranes[1].dead: # todo: Strategy Phases
                     if self.hold % n == len(output[self.hold // n]):
                         # print("ORDERED!", self.hold)
                         # ordered item!
@@ -233,6 +237,7 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
             c.step()
         pad()
         clear_residue()
+        if dispatch_count[0] >= n*n: break
 
     M0 = len(cranes[0].seq)
     M1 = sum(
@@ -252,7 +257,7 @@ def rep(x: int, n: int):
 def solve_multi(n: int, a: "list[list[int]]"):
     best = 1e9
     ans = ""
-    for i in range(10):
+    for i in range(1):
         score, res = solve(n, a)
         if score < best:
             best = score
@@ -264,5 +269,5 @@ if __name__ == "__main__":
     n = int(input())
     a = [[int(x) for x in input().strip().split()] for _ in range(n)]
     score, ans = solve_multi(n, a)
-    # print(score)
+    print(score)
     print(ans)

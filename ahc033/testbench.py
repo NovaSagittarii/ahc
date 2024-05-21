@@ -24,7 +24,9 @@ for _ in range(T):
         print(n)
         for row in a: 
             print(" ".join(str(s) for s in row))
+        print(y)
         print()
+        break
 
 print("prev", 14396)
 print("curr", penalty / T * 50)
