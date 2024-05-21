@@ -14,12 +14,17 @@ def gen_input(n: int):
     
     return a
 
-T = 50
+T = 10000
 penalty = 0
 for _ in range(T):
     a = gen_input(n)
     s, y = solve_multi(n, a)
     penalty += s
+    if s >= 1000: # adversial test case found
+        print(n)
+        for row in a: 
+            print(" ".join(str(s) for s in row))
+        print()
 
-print("prev", 102750)
-print("curr", penalty)
+print("prev", 14396)
+print("curr", penalty / T * 50)

@@ -1,5 +1,7 @@
 import random
 
+coords = [(i, j) for i in range(5) for j in range(5)]
+
 
 def count_inversions(a: "list[int]"):
     inversions = 0
@@ -79,7 +81,10 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
         def drop(self):
             if self.hold == -1:
                 return self.nop()
-            output[self.y].append(self.hold)
+            if self.x == n - 1:
+                output[self.y].append(self.hold)
+            else:
+                grid[self.y][self.x] = self.hold
             self.seq += "Q"
             self.hold = -1
 
@@ -88,7 +93,7 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
                 return False
             if cgrid[y][x]:
                 return False
-            if self.hold != -1 and grid[y][x] != -1:
+            if not self.big and self.hold != -1 and grid[y][x] != -1:
                 return False
             return True
 
@@ -116,10 +121,12 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
                 return False
 
         def struggle(self):
-            dx, dy = ((1, 0), (0, 1), (-1, 0), (0, -1))[random.randint(0, 3)]
+            dx, dy = ((1, 0), (0, 1), (-1, 0), (0, -1), (0, 0))[random.randint(0, 4)]
             self.goto(self.x + dx, self.y + dy, False)
 
         def goto(self, x: int, y: int, can_struggle: bool = True):
+            if self.dead:
+                return False
             dx = x - self.x
             dy = y - self.y
             # print(f"goto {x},{y}")
@@ -139,6 +146,8 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
                 return True
 
         def bomb(self):
+            if self.dead:
+                return self.nop()
             self.seq += "B"
             self.dead = True
             cgrid[self.y][self.x] = 0
@@ -146,21 +155,66 @@ def solve(n: int, a: "list[list[int]]", strategy: int = 0):
         def step(self):
             if self.dead:
                 return
+            if not self.big and curr[self.id] >= n - 1 and self.hold == -1:
+                self.bomb()
             if self.hold == -1:  # find *something*
+                if self.big:
+                    # find something good to take?
+                    good = []
+                    for x, y in coords:
+                        v = grid[y][x]
+                        if v == -1:
+                            continue
+                        order = v % 5
+                        col = v // 5
+                        if order == len(output[col]):
+                            good.append((x, y))
+                    if not len(good):
+                        # find something else to pop out
+                        good = [(0, i) for i in range(5) if grid[i][0] != -1]
+                    if len(good):
+                        x, y = good[0]
+                        # print(x, y, grid[y][x])
+                        if self.goto(x, y):
+                            self.take()
+                        return
                 candidates = sorted(
-                    [(abs(i - self.y), 0, i) for i in range(n) if grid[i][0] != -1]
+                    [
+                        (abs(i - self.y), 0, self.y + 0 * i)
+                        for i in range(n)
+                        if grid[i][0] != -1
+                    ]
                 )
+                # candidates = [(0, 0, self.y)]
+                # if grid[self.y][0] == -1: candidates = []
                 if len(candidates):
                     if self.goto(*candidates[0][1:]):
-                        self.take()
+                        if not self.big and curr[self.id] == n - 1:
+                            self.bomb()
+                        else:
+                            self.take()
                 else:
                     self.bomb()
                 # elif self.
             else:  # move it over
-                if self.goto(n - 1, self.hold // n):
-                    self.drop()
+                if self.big:
+                    if self.hold % n == len(output[self.hold // n]):
+                        # print("ORDERED!", self.hold)
+                        # ordered item!
+                        if self.goto(n - 1, self.hold // n):
+                            self.drop()
+                    else:  # unordered (just drop it off anywhere)
+                        # print("UNORDER", self.hold)
+                        nearest = min(
+                            *((x, y) for x, y in coords if grid[y][x] == -1 and x > 0),
+                            key=lambda xy: abs(xy[0] - self.x) + abs(xy[1] - self.y)
+                        )
+                        if self.goto(*nearest):
+                            self.drop()
+
                 else:
-                    self.goto(self.x + 1, self.y)
+                    if self.goto(n - curr[self.id], self.id):
+                        self.drop()
 
     cranes = [Crane(0, i) for i in range(n)]
 
@@ -196,11 +250,10 @@ def rep(x: int, n: int):
 
 
 def solve_multi(n: int, a: "list[list[int]]"):
-    strategies = [*rep(1, 60)]
     best = 1e9
     ans = ""
-    for strategy in strategies:
-        score, res = solve(n, a, strategy)
+    for i in range(10):
+        score, res = solve(n, a)
         if score < best:
             best = score
             ans = res
@@ -211,5 +264,5 @@ if __name__ == "__main__":
     n = int(input())
     a = [[int(x) for x in input().strip().split()] for _ in range(n)]
     score, ans = solve_multi(n, a)
-    print(score)
+    # print(score)
     print(ans)
