@@ -6,6 +6,10 @@ typedef std::array<int, 2> ai2;
 inline int dist(int x1, int y1, int x2, int y2) {
   return std::abs(x1-x2) + std::abs(y1-y2);
 }
+inline int dist(int x1, int y1, ai2 xy2) {
+  auto [x2, y2] = xy2;
+  return dist(x1, y1, x2, y2);
+}
 
 class Solution {
  private:
@@ -117,7 +121,13 @@ class Solution {
     this->n = n;
     this->a = a;
   }
-  void Solve(int T, int D) {
+
+  /**
+   * T  -- maximum time spent looking for additional High in state=1 (pickup)
+   * D  -- maximum distance to get additional High in state=1 (pickup)
+   * D2 -- maximum distance rerouting to get additional High in state=2 (dumping)
+   */
+  void Solve(int T, int D, int D2) {
     int state = 0;
     int t = 0; // time spent collecting
     while (NearLo()[0] != -1 || curr) {
@@ -138,6 +148,7 @@ class Solution {
               ++t;
             } else {
               state = 2; // nothing to go to
+              t = T - 10;
             }
           } else {
             state = 2; // give up
@@ -146,7 +157,14 @@ class Solution {
         }
         case 2:
           if (curr > 0) {
-            GoTo(NearLo());
+            auto l = NearHi();
+            if (t <= T && dist(di, dj, l) <= D2) {
+              if (GoTo(l)) {
+                ++t;
+              } else t = T+1;
+            } else {
+              GoTo(NearLo());
+            }
           } else {
             state = 0;
           }
@@ -174,12 +192,14 @@ int32_t main() {
   std::string sol;
   for (int t = 5; t <= 50; t += 5) {
     for (int d = 3; d <= 9; d += 2) {
-      Solution s(n, a);
-      s.Solve(t, d);
-      double score = s.ComputeScore();
-      if (score > best) {
-        best = score;
-        sol = s.Export();
+      for (int d2 = 0; d2 <= 9; d2 += 2) {
+        Solution s(n, a);
+        s.Solve(t, d, d2);
+        double score = s.ComputeScore();
+        if (score > best) {
+          best = score;
+          sol = s.Export();
+        }
       }
     }
   }
