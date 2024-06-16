@@ -116,6 +116,13 @@ class Solution {
     }
     return true;
   }
+  void Panic() { // go in a random direction
+    int dir = rand() % 4;
+    if (dir == 0) GoTo(0, dj);
+    else if (dir == 1) GoTo(n-1, dj);
+    else if (dir == 2) GoTo(di, 0);
+    else if (dir == 3) GoTo(di, n-1);
+  }
  public:
   Solution(int n, const vvi& a) {
     this->n = n;
@@ -126,12 +133,14 @@ class Solution {
    * T  -- maximum time spent looking for additional High in state=1 (pickup)
    * D  -- maximum distance to get additional High in state=1 (pickup)
    * D2 -- maximum distance rerouting to get additional High in state=2 (dumping)
+   * funny -- how much GoTo just does a funny
    */
-  void Solve(int T, int D, int D2) {
+  void Solve(int T, int D, int D2, int funny) {
     int state = 0;
     int t = 0; // time spent collecting
     while (NearLo()[0] != -1 || curr) {
       Level();
+      if (rand() % 100 < funny) Panic();
       switch (state) {
         case 0:
           if (GoTo(Highest())) {
@@ -192,13 +201,15 @@ int32_t main() {
   std::string sol;
   for (int t = 5; t <= 40; ++t) {
     for (int d = 3; d <= 9; d += 2) {
-      for (int d2 = 0; d2 <= 18; d2 += 2) {
-        Solution s(n, a);
-        s.Solve(t, d, d2);
-        double score = s.ComputeScore();
-        if (score > best) {
-          best = score;
-          sol = s.Export();
+      for (int d2 = 0; d2 <= 4; ++d2) {
+        for (int p : std::vector<int>{0, 1, 1}) {
+          Solution s(n, a);
+          s.Solve(t, d, d2, p);
+          double score = s.ComputeScore();
+          if (score > best) {
+            best = score;
+            sol = s.Export();
+          }
         }
       }
     }
