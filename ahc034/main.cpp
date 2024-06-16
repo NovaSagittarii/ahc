@@ -148,7 +148,7 @@ class Solution {
               ++t;
             } else {
               state = 2; // nothing to go to
-              t = T - 10;
+              t = 0;
             }
           } else {
             state = 2; // give up
@@ -190,9 +190,9 @@ int32_t main() {
 
   double best = 0;
   std::string sol;
-  for (int t = 5; t <= 50; t += 5) {
+  for (int t = 5; t <= 40; ++t) {
     for (int d = 3; d <= 9; d += 2) {
-      for (int d2 = 0; d2 <= 9; d2 += 2) {
+      for (int d2 = 0; d2 <= 18; d2 += 2) {
         Solution s(n, a);
         s.Solve(t, d, d2);
         double score = s.ComputeScore();
