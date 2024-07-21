@@ -6,6 +6,8 @@ class Solution {
     in >> n_ >> m_ >> t_;
     seed_count_ = 2 * n_ * (n_ - 1);
     a_.assign(seed_count_, std::vector<int>(m_));
+    char_max_.assign(m_, 0);
+    icm.clear();
   }
 
   void ReadSeeds() {
@@ -18,6 +20,7 @@ class Solution {
         a_[i][j] = x;
       }
     }
+    if (icm.empty()) icm = char_max_;
   }
 
   void Breed() {
@@ -38,7 +41,7 @@ class Solution {
     }
     // std::shuffle(results.begin(), results.end(),
     // std::default_random_engine(0));
-    std::sort(results.begin(), results.end());
+    std::sort(results.rbegin(), results.rend());
 
     std::vector<std::vector<int>> out(n_, std::vector<int>(n_, -1));
     int k = 0;  // which result current looking at
@@ -76,14 +79,19 @@ class Solution {
   typedef std::vector<int> vi;
   typedef std::vector<vi> vvi;
 
-  double Evaluate(vi& w) {
+  double Evaluate(const vi& w) {
     double score = 0;
     double value = 0;
     for (int i = 0; i < m_; ++i) {
-      double x = std::pow(char_max_[i] / (double)w[i], 2);
-      if (w[i] >= char_max_[i] * 0.9) x += 2;
+      double x = std::abs(std::pow(std::abs((double)w[i] / char_max_[i]), 0.5));
+      if (w[i] >= icm[i] * 0.5) x *= 1.1;
+      if (w[i] >= icm[i] * 0.7) x *= 1.5;
+      if (w[i] >= icm[i] * 0.8) x *= 2;
+      if (w[i] >= icm[i] * 0.9) x *= 4;
+      if (w[i] >= icm[i] * 0.95) x *= 4;
+      if (w[i] == icm[i]) x *= 10; // please keep these
       score += x;
-      // value += w[i];
+      value += std::abs(w[i]);
     }
     return score + std::sqrt(value);
   }
@@ -95,7 +103,8 @@ class Solution {
   int t_ = 10;           // number of iterations
   int seed_count_ = 60;  // = 2n(n-1)
   vvi a_;                // [seedcount][m] holds current seed characteristics
-  int char_max_[15];     // [m] characteristic max
+  vi char_max_;          // [m] characteristic max
+  vi icm;                // [m] initial characteristic max
 };
 
 // header guards to when compiling main.cpp as header in jury.cpp
