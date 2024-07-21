@@ -27,13 +27,6 @@ int32_t main() {
     for (auto &x : seed) std::cin >> x;
   }
 
-  vvstr u(n, vstr(n - 1));  // horizontal
-  vvstr v(n - 1, vstr(n));  // verticals
-  for (auto &row : u)
-    for (auto &x : row) std::cin >> x;
-  for (auto &row : v)
-    for (auto &x : row) std::cin >> x;
-
   std::stringstream in, out;
   in << n << " " << m << " " << t << "\n";
   auto PrintSeeds = [&]() -> void {
@@ -50,10 +43,18 @@ int32_t main() {
     for (auto x : a[0]) std::cout << x << " ";
     std::cout << "\n";
 
+    PrintSeeds();
     sol.ReadSeeds();
     sol.Breed();
 
     // do breeding based on how they got sown
+    vvstr u(n, vstr(n - 1));  // horizontal
+    vvstr v(n - 1, vstr(n));  // verticals
+    for (auto &row : u)
+      for (auto &x : row) std::cin >> x;
+    for (auto &row : v)
+      for (auto &x : row) std::cin >> x;
+
     vvi g(n, vi(n));
     for (auto &row : g) {
       for (auto &x : row) out >> x;
@@ -86,10 +87,9 @@ int32_t main() {
     }
 
     a = std::move(b);
-    PrintSeeds();
   }
 
-  int score = 0;
+  double score = 0;
   std::vector<int> attr_max(m);
   int W = 0;
   for (auto &seed : a) {
@@ -102,7 +102,7 @@ int32_t main() {
   }
   int attr_max_sum = 0;
   for (auto x : attr_max) attr_max_sum += x;
-  score = std::round(1e6 * W / attr_max_sum);
+  score = std::round(1000000.0 * W / attr_max_sum);
 
   std::cerr << "score = " << score << std::endl;
 }

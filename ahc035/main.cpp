@@ -5,6 +5,7 @@ class Solution {
   Solution(std::istream& in, std::ostream& out) : in_(in), out_(out) {
     in >> n_ >> m_ >> t_;
     seed_count_ = 2 * n_ * (n_ - 1);
+    a_.assign(seed_count_, std::vector<int>(m_));
   }
 
   void ReadSeeds() {
@@ -35,7 +36,8 @@ class Solution {
     for (int i = 0; i < seed_count_; ++i) {
       results[i] = {Evaluate(a_[i]), i};
     }
-    // std::shuffle(results.begin(), results.end(), std::default_random_engine(0));
+    // std::shuffle(results.begin(), results.end(),
+    // std::default_random_engine(0));
     std::sort(results.begin(), results.end());
 
     std::vector<std::vector<int>> out(n_, std::vector<int>(n_, -1));
@@ -71,13 +73,18 @@ class Solution {
   }
 
  private:
-  double Evaluate(int* w) {
+  typedef std::vector<int> vi;
+  typedef std::vector<vi> vvi;
+
+  double Evaluate(vi& w) {
     double score = 0;
+    double value = 0;
     for (int i = 0; i < m_; ++i) {
-      double x = (double)char_max_[i] / w[i]; // + w[i] / 100.0;
-      score += std::pow(x, 2);
+      double x = std::pow((double)char_max_[i] / w[i], 2);
+      score += x;
+      value += w[i];
     }
-    return score;
+    return score + std::sqrt(value);
   }
 
   std::istream& in_;     // read input from here
@@ -86,7 +93,7 @@ class Solution {
   int m_ = 15;           // eval vector size
   int t_ = 10;           // number of iterations
   int seed_count_ = 60;  // = 2n(n-1)
-  int a_[60][15];        // [seedcount][m] holds current seed characteristics
+  vvi a_;                // [seedcount][m] holds current seed characteristics
   int char_max_[15];     // [m] characteristic max
 };
 
