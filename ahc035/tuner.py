@@ -14,7 +14,7 @@ def objective_function(x):
     for T in range(10):
         test_id = random.randint(0, 99)
         score += run_test(test_id, args)
-    return score
+    return -score
 
 
 # Define the optimization problem
