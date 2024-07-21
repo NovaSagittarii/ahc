@@ -6,9 +6,8 @@ tot = 0
 tot2 = 0
 tests = 100
 
-
-def run_test(i):
-    p = subprocess.Popen(f'./build/jury < ./in/{str(i).zfill(4)}.txt', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+def run_test(i, args=[]):
+    p = subprocess.Popen(f'./build/jury {" ".join(args)} < ./in/{str(i).zfill(4)}.txt', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     _out, err = p.communicate('')
     score = int(err.split()[2])
     return score
@@ -19,16 +18,17 @@ def run_test(i):
 #     tot2 += score * score
 
 # run in parallel
-with Pool() as pool: 
-    w = pool.map(run_test, list(range(tests)))
-    for score in w:
-        tot += score
-        tot2 += score * score
+if __name__ == "__main__":
+    with Pool() as pool: 
+        w = pool.map(run_test, list(range(tests)))
+        for score in w:
+            tot += score
+            tot2 += score * score
 
-Ex = tot / tests
-Ex2 = tot2 / tests
+    Ex = tot / tests
+    Ex2 = tot2 / tests
 
-mu = Ex
-sigma = (Ex2 - Ex**2) ** 0.5
-print(f"{mu:.2f} +/- {sigma:.2f}")
+    mu = Ex
+    sigma = (Ex2 - Ex**2) ** 0.5
+    print(f"{mu:.2f} +/- {sigma:.2f}")
 

@@ -2,6 +2,8 @@
 
 class Solution {
  public:
+  std::vector<double> coef = {1.0, 0.0, 0.8, 0.1,  2, 4,
+                              8,   10,  10,  0.27, 2, 0.5};
   Solution(std::istream& in, std::ostream& out) : in_(in), out_(out) {
     in >> n_ >> m_ >> t_;
     seed_count_ = 2 * n_ * (n_ - 1);
@@ -23,10 +25,10 @@ class Solution {
     }
     if (icm.empty()) icm = char_max_;
 
-    // std::vector<std::array<int, 2>> b(m_);
-    // for (int i = 0; i < m_; ++i) b[i] = {char_max_[i], i};
-    // std::sort(b.begin(), b.end());
-    // for (int i = 0; i < m_; ++i) cw[b[i][1]] = 1.0 + i/99.0;
+    std::vector<std::array<int, 2>> b(m_);
+    for (int i = 0; i < m_; ++i) b[i] = {char_max_[i], i};
+    std::sort(b.begin(), b.end());
+    for (int i = 0; i < m_; ++i) cw[b[i][1]] = coef[0] + i * coef[1];
   }
 
   void Breed() {
@@ -91,18 +93,18 @@ class Solution {
     for (int i = 0; i < m_; ++i) {
       double x = std::abs(std::pow(std::abs((double)w[i] / icm[i]), 0.2));
       // if (w[i] >= icm[i] * 0.7) x *= 1.5;
-      constexpr double MIN_THRES = 0.8;
+      double MIN_THRES = coef[2];
       if (w[i] < icm[i] * MIN_THRES) x *= 0;
-      if (w[i] >= icm[i] * MIN_THRES) x *= 0.1;
-      if (w[i] >= icm[i] * 0.85) x *= 2;
-      if (w[i] >= icm[i] * 0.90) x *= 4;
-      if (w[i] >= icm[i] * 0.95) x *= 8;
-      if (w[i] == icm[i]) x *= 10;        // please keep these
-      if (w[i] == char_max_[i]) x *= 10;  // also keep these
-      score += std::pow(x, 0.27) * cw[i];
-      value += std::pow(w[i], 2) * cw[i];
+      if (w[i] >= icm[i] * MIN_THRES) x *= coef[3];  // 0.1
+      if (w[i] >= icm[i] * 0.85) x *= coef[4];       // 2
+      if (w[i] >= icm[i] * 0.90) x *= coef[5];       // 4
+      if (w[i] >= icm[i] * 0.95) x *= coef[6];       // 8
+      if (w[i] == icm[i]) x *= coef[7];              // (10) please keep these
+      if (w[i] == char_max_[i]) x *= coef[8];        // (10) also keep these
+      score += std::pow(x, coef[9]) * cw[i];         // 0.27
+      value += std::pow(w[i], coef[10]) * cw[i];     // 2
     }
-    return score + std::pow(value, 0.5);
+    return score + std::pow(value, coef[11]);
   }
 
   std::istream& in_;       // read input from here

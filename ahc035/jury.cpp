@@ -15,7 +15,7 @@ typedef std::vector<vi> vvi;
 typedef std::vector<std::string> vstr;
 typedef std::vector<vstr> vvstr;
 
-int32_t main() {
+int32_t main(int argc, char **argv) {
   int n;  // grid width & height
   int m;  // characteristics
   int t;  // iterations
@@ -47,6 +47,13 @@ int32_t main() {
   };
 
   Solution sol(in, out);
+  if (argc == 13) {
+    for (int i = 0; i < 12; ++i) {
+      // std::cerr << argv[i+1] << "\n";
+      sol.coef[i] = std::stod(argv[i + 1]);
+    }
+  }
+
   for (int iter = 0; iter < t; ++iter) {
     std::cout << "# s00 = ";
     for (auto x : a[0]) std::cout << x << " ";
