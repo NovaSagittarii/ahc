@@ -83,17 +83,19 @@ class Solution {
     double score = 0;
     double value = 0;
     for (int i = 0; i < m_; ++i) {
-      double x = std::abs(std::pow(std::abs((double)w[i] / char_max_[i]), 0.5));
-      if (w[i] >= icm[i] * 0.5) x *= 1.1;
-      if (w[i] >= icm[i] * 0.7) x *= 1.5;
-      if (w[i] >= icm[i] * 0.8) x *= 2;
-      if (w[i] >= icm[i] * 0.9) x *= 4;
+      double x = std::abs(std::pow(std::abs((double)w[i] / icm[i]), 0.2));
+      // if (w[i] >= icm[i] * 0.7) x *= 1.5;
+      if (w[i] >= icm[i] * 0.8) x *= 0.1;
+      else x = 0; // no longer useful
+      if (w[i] >= icm[i] * 0.85) x *= 2;
+      if (w[i] >= icm[i] * 0.90) x *= 4;
       if (w[i] >= icm[i] * 0.95) x *= 8;
-      if (w[i] == icm[i]) x *= 10; // please keep these
-      score += x;
-      value += std::abs(w[i]);
+      if (w[i] == icm[i]) x *= 10;        // please keep these
+      if (w[i] == char_max_[i]) x *= 10;  // also keep these
+      score += std::pow(x, 0.27);
+      value += std::pow(w[i], 2);
     }
-    return score + std::sqrt(value);
+    return score + std::pow(value, 0.5);
   }
 
   std::istream& in_;     // read input from here
