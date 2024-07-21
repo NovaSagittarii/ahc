@@ -88,7 +88,7 @@ class Solution {
       if (w[i] >= icm[i] * 0.7) x *= 1.5;
       if (w[i] >= icm[i] * 0.8) x *= 2;
       if (w[i] >= icm[i] * 0.9) x *= 4;
-      if (w[i] >= icm[i] * 0.95) x *= 4;
+      if (w[i] >= icm[i] * 0.95) x *= 8;
       if (w[i] == icm[i]) x *= 10; // please keep these
       score += x;
       value += std::abs(w[i]);
