@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 import subprocess
 subprocess.run(['make', 'build/jury'], stdout=subprocess.DEVNULL)
 
@@ -6,12 +7,23 @@ tot2 = 0
 tests = 100
 
 
-for i in range(tests):
+def run_test(i):
     p = subprocess.Popen(f'./build/jury < ./in/{str(i).zfill(4)}.txt', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-    out, err = p.communicate('')
+    _out, err = p.communicate('')
     score = int(err.split()[2])
-    tot += score
-    tot2 += score * score
+    return score
+
+# for i in range(tests):
+#     score = run_test(i)
+#     tot += score
+#     tot2 += score * score
+
+# run in parallel
+with Pool() as pool: 
+    w = pool.map(run_test, list(range(tests)))
+    for score in w:
+        tot += score
+        tot2 += score * score
 
 Ex = tot / tests
 Ex2 = tot2 / tests
