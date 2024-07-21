@@ -80,9 +80,10 @@ class Solution {
     double score = 0;
     double value = 0;
     for (int i = 0; i < m_; ++i) {
-      double x = std::pow((double)char_max_[i] / w[i], 2);
+      double x = std::pow(char_max_[i] / (double)w[i], 2);
+      if (w[i] >= char_max_[i] * 0.9) x += 2;
       score += x;
-      value += w[i];
+      // value += w[i];
     }
     return score + std::sqrt(value);
   }

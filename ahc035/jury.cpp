@@ -27,6 +27,15 @@ int32_t main() {
     for (auto &x : seed) std::cin >> x;
   }
 
+  std::vector<int> attr_max(m);
+  int attr_max_sum = 0;
+  for (auto &seed : a) {
+    for (int i = 0; i < m; ++i) {
+      attr_max[i] = std::max(attr_max[i], seed[i]);
+    }
+  }
+  for (auto x : attr_max) attr_max_sum += x;
+
   std::stringstream in, out;
   in << n << " " << m << " " << t << "\n";
   auto PrintSeeds = [&]() -> void {
@@ -90,18 +99,14 @@ int32_t main() {
   }
 
   double score = 0;
-  std::vector<int> attr_max(m);
   int W = 0;
   for (auto &seed : a) {
     int sum = 0;
     for (int i = 0; i < m; ++i) {
-      attr_max[i] = std::max(attr_max[i], seed[i]);
       sum += seed[i];
     }
     W = std::max(W, sum);
   }
-  int attr_max_sum = 0;
-  for (auto x : attr_max) attr_max_sum += x;
   score = std::round(1000000.0 * W / attr_max_sum);
 
   std::cerr << "score = " << score << std::endl;
