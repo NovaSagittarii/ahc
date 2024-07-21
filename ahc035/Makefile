@@ -6,14 +6,18 @@ CC_FLAGS = -Wall -Wextra -pedantic -O0 -g -Wshadow -Wformat=2 \
 CC = g++ -std=c++17 $(CC_FLAGS)
 CC17 = g++ -std=c++17 -O2
 
-build/jury: jury.cpp
-	$(CC) $^ -o $@
+build/jury: jury.cpp main.cpp
+	$(CC) jury.cpp -o $@
 
 build/main: main.cpp
 	$(CC) $^ -o $@
 
-.PHONY: preview test
+.PHONY: preview test clean
+
 preview: build/main
 	$^
 
 test: build/jury build/main build/interactor
+
+clean:
+	rm build/*

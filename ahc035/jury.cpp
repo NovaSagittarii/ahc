@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -21,15 +22,17 @@ int32_t main() {
   std::cin >> n >> m >> t;
   int seed_count = 2 * n * (n - 1);
 
-  vvi a(seed_count, vi(m));
+  vvi a(seed_count, vi(m));  // seeds
   for (auto &seed : a) {
     for (auto &x : seed) std::cin >> x;
   }
 
   vvstr u(n, vstr(n - 1));  // horizontal
   vvstr v(n - 1, vstr(n));  // verticals
-  for (auto &row : u) for (auto &x : row) std::cin >> x;
-  for (auto &row : v) for (auto &x : row) std::cin >> x;
+  for (auto &row : u)
+    for (auto &x : row) std::cin >> x;
+  for (auto &row : v)
+    for (auto &x : row) std::cin >> x;
 
   std::stringstream in, out;
   in << n << " " << m << " " << t << "\n";
@@ -43,6 +46,10 @@ int32_t main() {
 
   Solution sol(in, out);
   for (int iter = 0; iter < t; ++iter) {
+    std::cout << "# s00 = ";
+    for (auto x : a[0]) std::cout << x << " ";
+    std::cout << "\n";
+
     sol.ReadSeeds();
     sol.Breed();
 
@@ -60,19 +67,19 @@ int32_t main() {
 
     // [u] horizontals
     for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n-1; ++j) {
+      for (int j = 0; j < n - 1; ++j) {
         for (int k = 0; k < m; ++k) {
-          b[bi][k] = u[i][j][k] == '0' ? a[g[i][j]][k] : a[g[i][j+1]][k];
+          b[bi][k] = u[i][j][k] == '0' ? a[g[i][j]][k] : a[g[i][j + 1]][k];
         }
         ++bi;
       }
     }
-    
+
     // [v] verticals
-    for (int i = 0; i < n-1; ++i) {
+    for (int i = 0; i < n - 1; ++i) {
       for (int j = 0; j < n; ++j) {
         for (int k = 0; k < m; ++k) {
-          b[bi][k] = v[i][j][k] == '0' ? a[g[i][j]][k] : a[g[i+1][j]][k];
+          b[bi][k] = v[i][j][k] == '0' ? a[g[i][j]][k] : a[g[i + 1][j]][k];
         }
         ++bi;
       }
@@ -81,4 +88,21 @@ int32_t main() {
     a = std::move(b);
     PrintSeeds();
   }
+
+  int score = 0;
+  std::vector<int> attr_max(m);
+  int W = 0;
+  for (auto &seed : a) {
+    int sum = 0;
+    for (int i = 0; i < m; ++i) {
+      attr_max[i] = std::max(attr_max[i], seed[i]);
+      sum += seed[i];
+    }
+    W = std::max(W, sum);
+  }
+  int attr_max_sum = 0;
+  for (auto x : attr_max) attr_max_sum += x;
+  score = std::round(1e6 * W / attr_max_sum);
+
+  std::cerr << "score = " << score << std::endl;
 }

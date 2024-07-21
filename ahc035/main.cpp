@@ -14,6 +14,7 @@ class Solution {
         int x;
         in_ >> x;
         char_max_[j] = std::max(char_max_[j], x);
+        a_[i][j] = x;
       }
     }
   }
@@ -34,7 +35,7 @@ class Solution {
     for (int i = 0; i < seed_count_; ++i) {
       results[i] = {Evaluate(a_[i]), i};
     }
-    std::shuffle(results.begin(), results.end(), std::default_random_engine(0));
+    // std::shuffle(results.begin(), results.end(), std::default_random_engine(0));
     std::sort(results.begin(), results.end());
 
     std::vector<std::vector<int>> out(n_, std::vector<int>(n_, -1));
@@ -73,8 +74,8 @@ class Solution {
   double Evaluate(int* w) {
     double score = 0;
     for (int i = 0; i < m_; ++i) {
-      score += (double)char_max_[i] / w[i];
-      score += w[i] / 100.0;
+      double x = (double)char_max_[i] / w[i]; // + w[i] / 100.0;
+      score += std::pow(x, 2);
     }
     return score;
   }
