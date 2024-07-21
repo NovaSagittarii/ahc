@@ -7,6 +7,7 @@ class Solution {
     seed_count_ = 2 * n_ * (n_ - 1);
     a_.assign(seed_count_, std::vector<int>(m_));
     char_max_.assign(m_, 0);
+    cw.assign(m_, 1);
     icm.clear();
   }
 
@@ -21,6 +22,11 @@ class Solution {
       }
     }
     if (icm.empty()) icm = char_max_;
+
+    // std::vector<std::array<int, 2>> b(m_);
+    // for (int i = 0; i < m_; ++i) b[i] = {char_max_[i], i};
+    // std::sort(b.begin(), b.end());
+    // for (int i = 0; i < m_; ++i) cw[b[i][1]] = 1.0 + i/99.0;
   }
 
   void Breed() {
@@ -85,28 +91,30 @@ class Solution {
     for (int i = 0; i < m_; ++i) {
       double x = std::abs(std::pow(std::abs((double)w[i] / icm[i]), 0.2));
       // if (w[i] >= icm[i] * 0.7) x *= 1.5;
-      if (w[i] >= icm[i] * 0.8) x *= 0.1;
-      else x = 0; // no longer useful
+      constexpr double MIN_THRES = 0.8;
+      if (w[i] < icm[i] * MIN_THRES) x *= 0;
+      if (w[i] >= icm[i] * MIN_THRES) x *= 0.1;
       if (w[i] >= icm[i] * 0.85) x *= 2;
       if (w[i] >= icm[i] * 0.90) x *= 4;
       if (w[i] >= icm[i] * 0.95) x *= 8;
       if (w[i] == icm[i]) x *= 10;        // please keep these
       if (w[i] == char_max_[i]) x *= 10;  // also keep these
-      score += std::pow(x, 0.27);
-      value += std::pow(w[i], 2);
+      score += std::pow(x, 0.27) * cw[i];
+      value += std::pow(w[i], 2) * cw[i];
     }
     return score + std::pow(value, 0.5);
   }
 
-  std::istream& in_;     // read input from here
-  std::ostream& out_;    // write output to here
-  int n_ = 6;            // grid dimension
-  int m_ = 15;           // eval vector size
-  int t_ = 10;           // number of iterations
-  int seed_count_ = 60;  // = 2n(n-1)
-  vvi a_;                // [seedcount][m] holds current seed characteristics
-  vi char_max_;          // [m] characteristic max
-  vi icm;                // [m] initial characteristic max
+  std::istream& in_;       // read input from here
+  std::ostream& out_;      // write output to here
+  int n_ = 6;              // grid dimension
+  int m_ = 15;             // eval vector size
+  int t_ = 10;             // number of iterations
+  int seed_count_ = 60;    // = 2n(n-1)
+  vvi a_;                  // [seedcount][m] holds current seed characteristics
+  vi char_max_;            // [m] characteristic max
+  vi icm;                  // [m] initial characteristic max
+  std::vector<double> cw;  // [m] characteristic weight
 };
 
 // header guards to when compiling main.cpp as header in jury.cpp
