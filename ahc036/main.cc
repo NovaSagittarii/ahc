@@ -111,7 +111,7 @@ class Solver {
     for (int i = 0; i < H; ++i) to_hub_index[hubs[i]] = i;
 
     // compute APSP over hubs
-    std::vector<std::vector<int>> hdist(H, std::vector<int>(H));
+    h_dist.assign(H, std::vector<int>(H));
     std::vector<int> vis(N, -1);
     for (int i = 0; i < H; ++i) {
       const int s = hubs[i];
@@ -124,7 +124,7 @@ class Solver {
           q.pop();
           if (vis[u] == i) continue;
           vis[u] = i;
-          if (to_hub_index[u] != -1) hdist[i][to_hub_index[u]] = depth;
+          if (to_hub_index[u] != -1) h_dist[i][to_hub_index[u]] = depth;
           for (auto v : adj[u]) {
             if (vis[v] == i) continue;
             q.push(v);
@@ -140,16 +140,16 @@ class Solver {
     std::vector<std::array<int, 3>> edge_order;
     for (int i = 0; i < H; ++i) {
       for (int j = i + 1; j < H; ++j) {
-        edge_order.push_back({hdist[i][j], i, j});
+        edge_order.push_back({h_dist[i][j], i, j});
       }
     }
     std::sort(edge_order.begin(), edge_order.end());
 
     // hub network adjacency list
-    std::vector<std::vector<std::array<int, 2>>> h_adj(H);
+    h_adj.assign(H, {});
     UF dsu(H);
     // build MST first
-    for (auto& [w, u, v] : edge_order) {
+    for (auto &[w, u, v] : edge_order) {
       if (!dsu.sameSet(u, v)) {
         h_adj[u].push_back({v, w});
         h_adj[v].push_back({u, w});
@@ -162,12 +162,12 @@ class Solver {
 
     // then add edges to form MSG
     for (auto [w, s, t] : edge_order) {
-      if (w == -1) continue; // used in MST
+      if (w == -1) continue;  // used in MST
       bool take_edge = true;
       // compute h_adj SSSP distance
       // you'll take it, unless u-v is sufficiently close
       take_edge = true;
-      const int threshold = std::max(8, (int)(hdist[s][t] * 1.6));
+      const int threshold = std::max(8, (int)(h_dist[s][t] * 1.6));
       std::priority_queue<std::array<int, 2>> pq;
       pq.push({0, s});
       int vis_id = s * H + t;
@@ -205,11 +205,14 @@ class Solver {
   // };
 
   int N, M, T, LA, LB;
-  std::vector<std::vector<int>> adj;
-  std::vector<int> A, B;
-  std::vector<int> targets;
+  std::vector<std::vector<int>> adj;  // adj-list for nodes
+  std::vector<int> A, B;              // active nodes (slow/fast memory)
+  std::vector<int> targets;           // paths that must be taken
   std::vector<std::array<int, 2>> coords;
-  std::vector<int> hubs;
+
+  std::vector<int> hubs;                               // which nodes are hubs
+  std::vector<std::vector<std::array<int, 2>>> h_adj;  // adj-list for hubs
+  std::vector<std::vector<int>> h_dist;                // APSP over hubs
 };
 
 int32_t main() {
