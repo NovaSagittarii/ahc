@@ -41,8 +41,18 @@ class Solution {
         }
       }
       auto [pi, pj] = prev;
-      ans.push_back({pi * dx, pj * dy, i * dx, j * dy});
-      exist.insert({i, j});
+      int mi = std::min(pi, i);
+      int mi2 = (i+pi)/2;
+      int mj = std::max(pj, j);
+      auto Insert = [&](int pi, int pj, int i, int j) -> void {
+        if (exist.count({i, j}) == 0) {
+          ans.push_back({pi * dx, pj * dy, i * dx, j * dy});
+          exist.insert({i, j});
+        }
+      };
+      Insert(pi, pj, mi, mj);
+      Insert(mi, mj, mi2, mj);
+      Insert(mi2, mj, i, j);
     }
 
     for (auto [x, y] : a) {
