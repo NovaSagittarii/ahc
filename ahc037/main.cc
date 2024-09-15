@@ -16,8 +16,10 @@ class Solution {
       int i = x / dx;
       int j = y / dy;
       used.insert({i + j * N, i, j});
-      if (x < 1e8) used.insert({i, i, 0});
-      if (y < 1e8) used.insert({j * N, 0, j});
+      if (std::min(x, y) < 1e8) {
+        used.insert({i, i, 0});
+        used.insert({j * N, 0, j});
+      }
     }
     return used;
   }
