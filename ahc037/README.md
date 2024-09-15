@@ -75,3 +75,7 @@ you want to go up immediately and then slowly to the right.
 This actually does pretty well! (4.2B) Maybe go to the right more slowly?
 
 Oops, I messed up the mesh axis, fixing it improves it slightly (4.4B).
+
+Clearly doing more subdivisions is better so.... let's increase it to 5!
+This uses 90% of points on Test#0 so this should be enough margin. There is 
+a slight improvement when you do this (4.5B).

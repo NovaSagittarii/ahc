@@ -54,10 +54,17 @@ class Solution {
         }
       };
 
+      std::vector<int> mi;
+      const int kSubdivisions = 5;
+      for (int k = 0; k < kSubdivisions; ++k) {
+        mi.push_back(pi + (i - pi) / kSubdivisions * k);
+      }
+      mi.push_back(i);
       if (j) {
         Insert(pi, pj, pi, j);
-        Insert(pi, j, mi2, j);
-        Insert(mi2, j, i, j);
+        for (int i = 1; i < mi.size(); ++i) {
+          Insert(mi[i - 1], j, mi[i], j);
+        }
       } else {
         Insert(pi, pj, i, j);
       }
