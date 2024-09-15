@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 
+const int kSubdivisions = 3;
+
 class Solution {
  public:
   Solution(int N, std::vector<std::array<int, 2>> a) : N(N), a(a) {}
@@ -9,6 +11,13 @@ class Solution {
     return {dx, dy};
   }
 
+  /**
+   * @brief Generates the mesh used by the existing points.
+   *
+   * @param n
+   * @param m
+   * @return std::set<std::array<int, 3>>
+   */
   std::set<std::array<int, 3>> ComputeGrid(int n, int m) {
     const auto [dx, dy] = ComputeGridSpacing(n, m);
     std::set<std::array<int, 3>> used;
@@ -27,12 +36,68 @@ class Solution {
     return used;
   }
 
+  /**
+   * @brief Adds in extra points whenever you would've had two long vertical
+   * lines parallel to each other.
+   *
+   * @param mesh list of points you'll connect later
+   */
+  void PatchMesh(int n, int m, std::set<std::array<int, 3>> &mesh) {
+    const auto [dx, dy] = ComputeGridSpacing(n, m);
+    std::set<std::array<int, 2>> exist;
+    exist.insert({0, 0});
+    auto used = ComputeGrid(n, m);
+    std::vector<std::array<int, 2>> additions;
+    for (auto [_, i, j] : mesh) {
+      std::array<int, 2> prev;
+      int best = 1e9;
+      for (auto [i2, j2] : exist) {
+        if (i2 <= i && j2 <= j) {
+          int score = i - i2 + j - j2;
+          if (score < best) {
+            best = score;
+            prev = {i2, j2};
+          }
+        }
+      }
+      auto [pi, pj] = prev;
+      int mi2 = (i + pi) / 2;
+      auto Insert = [&](int pi, int pj, int i, int j) -> void {
+        if (exist.count({i, j}) == 0) {
+          exist.insert({i, j});
+        }
+      };
+
+      std::vector<int> mi;
+      for (int k = 0; k < kSubdivisions; ++k) {
+        mi.push_back(pi + (i - pi) / kSubdivisions * k);
+      }
+      mi.push_back(i);
+      if (j) {
+        if (j - pj > 3 && i) {
+          for (int w = pj; w < j; w += 15) {
+            additions.push_back({pi, w});
+          }
+        } else {
+          Insert(pi, pj, pi, j);
+        }
+        for (int i = 1; i < mi.size(); ++i) {
+          Insert(mi[i - 1], j, mi[i], j);
+        }
+      } else {  // mesh x-axis
+        Insert(pi, pj, i, j);
+      }
+    }
+    for (auto [i, j] : additions) mesh.insert({i + j * N, i, j});
+  }
+
   std::vector<std::array<int, 4>> Solve(int n, int m) {
     const auto [dx, dy] = ComputeGridSpacing(n, m);
     std::vector<std::array<int, 4>> ans;
     std::set<std::array<int, 2>> exist;
     exist.insert({0, 0});
     auto used = ComputeGrid(n, m);
+    PatchMesh(n, m, used);
     for (auto [_, i, j] : used) {
       std::array<int, 2> prev;
       int best = 1e9;
@@ -55,7 +120,6 @@ class Solution {
       };
 
       std::vector<int> mi;
-      const int kSubdivisions = 5;
       for (int k = 0; k < kSubdivisions; ++k) {
         mi.push_back(pi + (i - pi) / kSubdivisions * k);
       }
@@ -65,7 +129,7 @@ class Solution {
         for (int i = 1; i < mi.size(); ++i) {
           Insert(mi[i - 1], j, mi[i], j);
         }
-      } else {
+      } else {  // mesh x-axis
         Insert(pi, pj, i, j);
       }
     }

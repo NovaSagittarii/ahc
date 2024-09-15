@@ -79,3 +79,15 @@ Oops, I messed up the mesh axis, fixing it improves it slightly (4.4B).
 Clearly doing more subdivisions is better so.... let's increase it to 5!
 This uses 90% of points on Test#0 so this should be enough margin. There is 
 a slight improvement when you do this (4.5B).
+
+So now the problem is you end up with too many parallel vertical lines since
+they're picked greedily, so let's do two passes, the first time is to
+detect these cases that the greedy strategy (increasing y) does poorly on.
+```
+x
+|x
+||
+++
+```
+
+This improves the result slightly (4.6B), which is pretty good.
