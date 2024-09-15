@@ -53,9 +53,14 @@ class Solution {
           exist.insert({i, j});
         }
       };
-      Insert(pi, pj, pi, j);
-      Insert(pi, j, mi2, j);
-      Insert(mi2, j, i, j);
+
+      if (j) {
+        Insert(pi, pj, pi, j);
+        Insert(pi, j, mi2, j);
+        Insert(mi2, j, i, j);
+      } else {
+        Insert(pi, pj, i, j);
+      }
     }
 
     for (auto [x, y] : a) {
