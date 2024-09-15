@@ -60,3 +60,7 @@ grid.
 It kinda worked, not that good though (1.8B). You can kinda change the mesh
 though, so I guess that's next. Additionally, you don't need a lot of the
 grid so you can also clean that out.
+
+Wow pruning the mesh worked pretty well! (3.2B). Additionally, pruning 
+freed up a lot of nodes (about 75% of the grid) so you can probably make
+the mesh denser.
