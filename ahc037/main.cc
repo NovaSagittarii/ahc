@@ -10,17 +10,38 @@ int32_t main() {
   // N = 1000
   // with merging that means 2000 in total
   // i have 3000 to spare
-  int di = (int)1e9 / 63;
-  int dj = (int)1e9 / 62;
-  for (int i = 0; i < 63; ++i) {
-    ans.push_back({0, i * di, 0, (i + 1) * di});
-    for (int j = 0; j < 62; ++j) {
-      ans.push_back({j * dj, i * di, (j + 1) * dj, i * di});
+  int n = 63;
+  int m = 62;
+  int dx = (int)1e9 / n;
+  int dy = (int)1e9 / m;
+  std::set<std::array<int, 3>> used;
+  for (auto [x, y] : a) {
+    int i = x / dx;
+    int j = y / dy;
+    used.insert({i + j*N, i, j});
+  }
+
+  std::set<std::array<int, 2>> exist;
+  exist.insert({0, 0});
+  for (auto [_, i, j] : used) {
+    std::array<int, 2> prev;
+    int best = 1e9;
+    for (auto [i2, j2] : exist) {
+      if (i2 <= i && j2 <= j) {
+        int score = i - i2 + j - j2;
+        if (score < best) {
+          best = score;
+          prev = {i2, j2};
+        }
+      }
     }
+    auto [pi, pj] = prev;
+    ans.push_back({pi * dx, pj * dy, i * dx, j * dy});
+    exist.insert({i, j});
   }
 
   for (auto [x, y] : a) {
-    ans.push_back({(x / dj) * dj, (y / di) * di, x, y});
+    ans.push_back({(x / dx) * dx, (y / dy) * dy, x, y});
   }
 
   std::cout << ans.size() << "\n";

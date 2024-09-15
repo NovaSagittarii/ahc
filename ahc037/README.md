@@ -56,3 +56,7 @@ So how fine is the grid? Well you have N=1000 points you need to visit, and
 1000 points of internal nodes if you were to merge (not now though). So you get
 4000 points for the grid (later on it is 3000), so evenly space out a 63x63
 grid.
+
+It kinda worked, not that good though (1.8B). You can kinda change the mesh
+though, so I guess that's next. Additionally, you don't need a lot of the
+grid so you can also clean that out.
