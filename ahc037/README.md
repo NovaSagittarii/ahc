@@ -48,3 +48,11 @@ x
 o-x
 ```
 
+Ok, I kinda built it wrong, the MST doesn't work out since edges are strange.
+Or I coded it wrong.
+
+However, the next good idea is making a grid, and the picking the closest point.
+So how fine is the grid? Well you have N=1000 points you need to visit, and
+1000 points of internal nodes if you were to merge (not now though). So you get
+4000 points for the grid (later on it is 3000), so evenly space out a 63x63
+grid.
