@@ -16,9 +16,9 @@ class Solution {
       int i = x / dx;
       int j = y / dy;
       used.insert({i + j * N, i, j});
+      if (x < 1e8) used.insert({i, i, 0});
+      if (y < 1e8) used.insert({j * N, 0, j});
     }
-    for (int x = 0; x < n; ++x) used.insert({x, x, 0});
-    for (int y = 0; y < m; ++y) used.insert({y * N, 0, y});
     return used;
   }
 
@@ -67,7 +67,7 @@ int32_t main() {
 
   int n = 500;
   int m = 500;
-  
+
   // int best = 0;
   // for (int i = 250; i < 300; ++i) {
   //   for (int j = 250; j < 300; ++j) {
