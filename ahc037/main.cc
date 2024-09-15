@@ -17,6 +17,8 @@ class Solution {
       int j = y / dy;
       used.insert({i + j * N, i, j});
     }
+    for (int x = 0; x < n; ++x) used.insert({x, x, 0});
+    for (int y = 0; y < m; ++y) used.insert({y * N, 0, y});
     return used;
   }
 
@@ -63,11 +65,20 @@ int32_t main() {
 
   Solution sol(N, a);
 
-  // N = 1000
-  // with merging that means 2000 in total
-  // i have 3000 to spare
-  int n = 63;
-  int m = 62;
+  int n = 500;
+  int m = 500;
+  
+  // int best = 0;
+  // for (int i = 250; i < 300; ++i) {
+  //   for (int j = 250; j < 300; ++j) {
+  //     int res = sol.ComputeGrid(i, j).size();
+  //     if (res < 4000 && res > best) {
+  //       n = i;
+  //       m = j;
+  //     }
+  //   }
+  // }
+  // std::cerr << n << " " << m << std::endl;
 
   auto ans = sol.Solve(n, m);
 
