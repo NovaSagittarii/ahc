@@ -17,8 +17,11 @@ class Solution {
       int j = y / dy;
       used.insert({i + j * N, i, j});
       if (std::min(x, y) < 1e8) {
-        used.insert({i, i, 0});
-        used.insert({j * N, 0, j});
+        if (x > y) {
+          used.insert({i, i, 0});
+        } else {
+          used.insert({j * N, 0, j});
+        }
       }
     }
     return used;
@@ -44,7 +47,7 @@ class Solution {
       }
       auto [pi, pj] = prev;
       int mi = std::min(pi, i);
-      int mi2 = (i+pi)/2;
+      int mi2 = (i + pi) / 2;
       int mj = std::max(pj, j);
       auto Insert = [&](int pi, int pj, int i, int j) -> void {
         if (exist.count({i, j}) == 0) {

@@ -73,3 +73,5 @@ consist of at most N=1000 points.
 So to make the horizonal reaching less, anytime while setting up the mesh,
 you want to go up immediately and then slowly to the right.
 This actually does pretty well! (4.2B) Maybe go to the right more slowly?
+
+Oops, I messed up the mesh axis, fixing it improves it slightly (4.4B).
