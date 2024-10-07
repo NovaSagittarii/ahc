@@ -1,5 +1,6 @@
 *.txt
 */*.txt
+*/*.out
 */__pycache__
 */.vscode
 */.venv
