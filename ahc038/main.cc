@@ -7,6 +7,8 @@ struct Vec2 {
   Vec2 operator+(const Vec2 &o) const { return {x + o.x, y + o.y}; }
   Vec2 operator-(const Vec2 &o) const { return {x - o.x, y - o.y}; }
   Vec2 operator*(const int k) const { return {x * k, y * k}; }
+  bool operator==(const Vec2 &o) const { return x == o.x && y == o.y; }
+  bool operator!=(const Vec2 &o) const { return !(*this == o); }
 
   int manhattan() { return std::abs(x) + std::abs(y); }
   int parity() { return (x + y) & 1; }
@@ -109,6 +111,7 @@ class Crane {
     ndir = (ndir - ddir + 4) % 4;
     if (leaves_[0].Set(ndir)) busy = true;
     ndir = (ndir + ddir) % 4;
+    u = u + dirs[ndir];
 
     return busy;
   }
@@ -157,23 +160,22 @@ class Solver {
     std::vector<std::array<int, 2>> tree;
     std::string s = ".";  // root
     std::string gs = ".";
-    Crane crane(V == 5 || N <= 16 ? 3 : 4, {1}, s, gs);
-    bool FULL = !(V == 5 && N > 16);
+    Crane crane(V == 5 ? 3 : 4, {1}, s, gs);
     int REACH = (2 << crane.arms().size()) - 1;
-    // std::cerr << "reach" << REACH << std::endl;
+    bool FULL = REACH > N;
+    std::cerr << "reach" << REACH << " ";
+    std::cerr << (FULL ? "full" : "limit") << std::endl;
     crane.WriteSetup(tree);
     Vec2 center(N / 2, N / 2);
     if (!FULL) center = {0, N / 2};
 
-    Vec2 kcenter = center;
-
+    Vec2 kcenter = center;  // original center
     Vec2 tcenter = center;  // target center position
     auto UpdateTCenter = [&](Vec2 p) -> void {
       tcenter = center;
       while ((p - tcenter).parity() == 0 || (p - tcenter).manhattan() > REACH) {
         int d = Crane::GetDirection(tcenter,
                                     FULL && tcenter.parity() ? kcenter : p);
-        s[0] = dirs_str[d];
         tcenter = tcenter + dirs[d];
       }
     };
@@ -184,11 +186,14 @@ class Solver {
       if ((p - center).parity() == 0 || (p - center).manhattan() > REACH) {
         int d =
             Crane::GetDirection(center, FULL && center.parity() ? kcenter : p);
-        s[0] = dirs_str[d];
-        if (can_move_center) center = center + dirs[d];
+        if (can_move_center) {
+          s[0] = dirs_str[d];
+          center = center + dirs[d];
+          // std::cout << "move " << dirs_str[d] << " " << center << "\n";
+        }
         busy = true;
       }
-      return crane.GoTo(tcenter, p) || busy;
+      return crane.GoTo(center, p) || busy;
     };
 
     std::vector<Vec2> a, b;
@@ -210,6 +215,7 @@ class Solver {
       while (Hover(a[i], true)) {
         crane.Tick();
         if (!Hover(a[i], false)) crane.leaves()[0].Grab();
+        // os << center << " ";
         os << s << gs << '\n';
         PostTick();
         crane.leaves()[0].Ungrab();
@@ -218,6 +224,7 @@ class Solver {
       while (Hover(b[i], true)) {
         crane.Tick();
         if (!Hover(b[i], false)) crane.leaves()[0].Grab();
+        // os << center << " ";
         os << s << gs << '\n';
         PostTick();
         crane.leaves()[0].Ungrab();
