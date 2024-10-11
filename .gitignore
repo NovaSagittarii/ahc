@@ -1,6 +1,7 @@
 *.txt
-*/*.txt
-*/*.out
-*/__pycache__
-*/.vscode
-*/.venv
+**/*.txt
+**/*.out
+**/__pycache__
+**/.vscode
+**/.venv
+**/main

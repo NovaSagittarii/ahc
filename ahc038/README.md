@@ -201,4 +201,14 @@ This would give more degrees of freedom to cluster, but seems quite painful to
 implement. Additionally, a $(2,1)$ arm can reach everything a $(3)$ arm can,
 and more.
 However, you suffer the loss of a leaf. This only makes sense if this results
-in a $\ge 10\%$ reduction in cluster count without worsening the routing much.
+in a $\ge 50\%$ reduction in cluster count without worsening the routing much.
+
+## $\text{4. Pairing is Hard}$
+
+Actually, pairing is too difficult if you build clusters first. Rather, you
+can't really find an good order for fixed clusters due to partial clusters.
+You can resolve this by performing clustering and pairing at the same time.
+
+## $\text{5. Layers all the way down}$
+
+What if you SA'd an arm hierarchy with a clustering for every level, recursively. It's kinda what's the entire task is about...
