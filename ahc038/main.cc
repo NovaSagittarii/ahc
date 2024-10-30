@@ -193,7 +193,7 @@ class Solver {
         }
         busy = true;
       }
-      return crane.GoTo(center, p) || busy;
+      return crane.GoTo(tcenter, p) || busy;
     };
 
     std::vector<Vec2> a, b;

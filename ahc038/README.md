@@ -212,3 +212,6 @@ You can resolve this by performing clustering and pairing at the same time.
 ## $\text{5. Layers all the way down}$
 
 What if you SA'd an arm hierarchy with a clustering for every level, recursively. It's kinda what's the entire task is about...
+
+Another way you can have leaves are attachments off of the main arm. Does this
+ever make sense? In rare situations, the arm lengths just sorta work out.
