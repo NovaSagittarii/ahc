@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 
-const int kSubdivisions = 3;
+const int kSubdivisions = 5;
 
 class Solution {
  public:
@@ -75,8 +75,10 @@ class Solution {
       mi.push_back(i);
       if (j) {
         if (j - pj > 3 && i) {
-          for (int w = pj; w < j; w += 15) {
+          int dw = 4;
+          for (int w = pj; w < j; w += dw+(std::rand()&1)) {
             additions.push_back({pi, w});
+            dw ^= 1;
           }
         } else {
           Insert(pi, pj, pi, j);
@@ -138,7 +140,73 @@ class Solution {
       ans.push_back({(x / dx) * dx, (y / dy) * dy, x, y});
     }
 
-    return ans;
+    return Cleanup(ans);
+  }
+
+  /**
+   * @brief Reduces unnecessary nodes.
+   *
+   * @param edges
+   */
+  std::vector<std::array<int, 4>> Cleanup(
+      const std::vector<std::array<int, 4>> &edges) {
+    std::vector<std::vector<int>> adj;
+    std::vector<std::array<int, 2>> coords;
+    std::map<std::array<int, 2>, int> to_index;
+    auto CreateNode = [&](int x, int y) -> std::array<int, 2> {
+      std::array<int, 2> p = {x, y};
+      if (to_index.count(p) == 0) {
+        to_index[p] = coords.size();
+        coords.push_back(p);
+        adj.push_back({});
+      }
+      return std::move(p);
+    };
+
+    for (auto [ux, uy, vx, vy] : edges) {
+      auto u = CreateNode(ux, uy);
+      auto v = CreateNode(vx, vy);
+      adj[to_index[u]].push_back(to_index[v]);
+    }
+
+    // for (int i = 0; i < adj.size(); ++i) {
+    //   std::cout << i << " (";
+    //   for (auto x : coords[i]) std::cout << x << " ";
+    //   std::cout << ") ";
+    //   for (auto x : adj[i]) std::cout << x << " ";
+    //   std::cout << "\n";
+    // }
+
+    for (int u = 0; u < adj.size(); ++u) {
+      // want to transform
+      // u---v---w    =>    u----w
+      std::vector<int> append;
+      for (int& v : adj[u]) {
+        if (adj[v].size() == 1) {
+          append.push_back(adj[v].front());
+          adj[v].clear();
+          v = -1;
+        }
+      }
+      for (auto w : append) adj[u].push_back(w);
+    }
+
+    std::vector<std::array<int, 4>> output;
+    std::vector<int> vis(adj.size());
+    auto dfs = [&](int u, auto&& dfs) -> void {
+      if (vis[u]) return;
+      vis[u] = 1;
+      
+      auto [ux, uy] = coords[u];
+      for (auto v : adj[u]) {
+        if (v == -1) continue;
+        auto [vx, vy] = coords[v];
+        output.push_back({ux, uy, vx, vy});
+        dfs(v, dfs);
+      }
+    };
+    for (int u = 0; u < adj.size(); ++u) dfs(u, dfs);
+    return output;
   }
 
  private:
